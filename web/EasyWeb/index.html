@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!-- /hint -->
+<html>
+<head>
+<script src="/static/js/jquery-3.5.1.min.js"></script>
+<script src="/static/js/popper.min.js" crossorigin="anonymous"></script>
+<script src="/static/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<link type="text/css" rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/bootstrap.min.css" crossorigin="anonymous"></head>
+<body>
+    <div style="width:100%;">
+        <div style="margin:0 auto; max-width:800px;width:100%;height:350px;border: 1px solid #444;" ondragover="dragoverHandler(event)" ondrop="dropHandler(event)">
+            <img src="/static/image/top.png" style="width:100%;height:100%">
+        </div>
+    </div>
+    
+    <div class="msg"></div>
+    <div style="max-width:800px;margin: 0 auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>FileName</th>
+                    <th class="text-right">Date</th>
+                </tr>
+            </thead>
+            <tbody id="picture">
+
+            </tbody>
+        </table>
+
+    </div>
+    <script>
+        $(function(){
+            $.ajax({
+                url: '/files',
+                async: true,
+                type: 'get',
+                dataType: 'json',
+                success: (data) => {
+                    data.forEach((item, idx) => {
+                        $('#picture').prepend("<tr><td>"+item.filename+"</td><td class='text-right'>"+item.date+"</td></tr>");
+                    });
+                },
+                error: (err) => {
+                    $('#picture').prepend("<tr><td>error</td><td class='text-right'>error</td></tr>");
+                }
+            });
+        });
+    </script>
+        <div class="message">
+        <div class="message-content">
+            <div class="message-header">
+                <div class="message-title"></div>
+            </div>
+            <div class="message-body">              
+            </div>
+        </div>
+        
+    </div>
+
+    <style>
+        .message{
+            -webkit-box-shadow: 0 2px 8px 0 rgba(0,0,0,.2);
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,.2);
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            -webkit-transform: translate3d(0,24px,0);
+            transform: translate3d(0,24px,0);
+            -webkit-transition: transform .15s cubic-bezier(0.4,0.0,1,1) ,opacity .15s cubic-bezier(0.4,0.0,1,1) ,visibility 0ms linear .15s;
+            transition: transform .15s cubic-bezier(0.4,0.0,1,1) ,opacity .15s cubic-bezier(0.4,0.0,1,1) ,visibility 0ms linear .15s;
+            bottom: 24px;
+            display: block;
+            left: auto;
+            max-height: 323px;
+
+
+            position: absolute;
+            right: 24px;
+
+            z-index: 1001;
+        }
+    </style>
+</body>
+</html>

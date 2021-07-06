@@ -1,0 +1,82 @@
+const salt = random('Aa0', 40);
+const HashCheck = sha256(sha256(salt + 'admin')).toString();
+
+let filter = (data) => {
+    let blackwords = ['alter', 'insert', 'drop', 'delete', 'update', 'convert', 'chr', 'char', 'concat', 'reg', 'to', 'query'];
+    let flag = false;
+
+    if (typeof data !== 'string') return true;
+
+    blackwords.forEach((value, idx) => {
+        if (data.includes(value)) {
+            console.log(`filter: ${value}`);
+            return (flag = true);
+        }
+    });
+
+    let limitwords = ['substring', 'left', 'right', 'if', 'case', 'sleep', 'replace', 'as', 'format', 'union'];
+    limitwords.forEach((value, idx) => {
+        if (count(data, value) > 3){
+            console.log(`limit: ${value}`);
+            return (flag = true);
+        }
+    });
+
+    return flag;
+}
+app.get('/source', async (req, res, next) => {
+    fs.readFile('./source.txt', 'utf8', (err, data) => {
+        if (err) {
+            res.send(err);
+        }
+        else {
+            res.send(data);
+        }
+    });
+});
+
+app.all('/', async (req, res, next) => {
+    if (req.method == 'POST') {
+        if (req.body.username && req.body.password) {
+            let username = req.body.username.toLowerCase();
+            let password = req.body.password.toLowerCase();
+
+            if (username === 'admin') {
+                res.send(`<script>alert("Don't want this!!!");location.href='/';</script>`);
+                return;
+            }
+            
+            UserHash = sha256(sha256(salt + username)).toString();
+            if (UserHash !== HashCheck) {
+                res.send(`<script>alert("NoNoNo~~~You are not admin!!!");location.href='/';</script>`);
+                return;
+            }
+
+            if (filter(password)) {
+                res.send(`<script>alert("Hacker!!!");location.href='/';</script>`);
+                return;
+            }
+
+            let sql = `select password,username from users where username='${username}' and password='${password}';`;
+            client.query(sql, [], (err, data) => {
+                if (err) {
+                    res.send(`<script>alert("Something Error!");location.href='/';</script>`);
+                    return;
+                }
+                else {
+                    if ((typeof data !== 'undefined') && (typeof data.rows[0] !== 'undefined') && (data.rows[0].password === password)) {
+                        res.send(`<script>alert("Congratulation,here is your flag:${flag}");location.href='/';</script>`);
+                        return;
+                    }
+                    else {
+                        res.send(`<script>alert("Password Error!!!");location.href='/';</script>`);
+                        return;
+                    }
+                }
+            });
+        }
+    }
+
+    res.render('index');
+    return;
+});
